@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JP's Astro Research</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #d4f4d2;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: #2d702d;
+      margin: 0;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .bio, .link, .form-block {
+      background: #ffffff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .bio h2, .link h2, .form-block h2 {
+      margin-top: 0;
+      color: #2d702d;
+    }
+
+    input[type="text"], input[type="date"], input[type="time"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: #2d702d;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #205220;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>JP's Astro Research</h1>
+  </header>
+
+  <div class="container">
+    <div class="bio">
+      <h2>About JP</h2>
+      <p>I am Jayprakash, passionate about Tamil astrology, KP system, Dasha-Bhukti, and Nakshatra-level analysis. This is a personal research portal to guide based on deep Jyotish knowledge. ❤️</p>
+    </div>
+
+    <div class="link">
+      <h2>My Links</h2>
+      <p>🔗 <a href="https://jayaprakash3195.github.io/my-website/" target="_blank">Click here to visit dasa based on age </a></p>
+    </div>
+
+    <div class="form-block">
+      <h2>Request Your Horoscope Reading</h2>
+      <form id="astroForm">
+        <label>Date of Birth:</label>
+        <input type="date" name="dob" required>
+
+        <label>Time of Birth:</label>
+        <input type="time" name="tob" required>
+
+        <label>Place of Birth:</label>
+        <input type="text" name="pob" placeholder="City, State" required>
+
+        <label>Your Question:</label>
+        <textarea name="question" rows="4" placeholder="Enter your question here..." required></textarea>
+
+        <button type="submit">Submit</button>
+      </form>
+      <p id="responseMsg" style="margin-top:15px; color: green;"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("astroForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const scriptURL = "https://script.google.com/macros/s/AKfycbzcOnscdiNCiuX-5xInzcCzwEWHiTOqMCrzFRnR7hVIcsUPjY4kMigv1avf_8yYd_uW/exec"; // Replace with your actual Web App URL
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("responseMsg").textContent = data;
+        form.reset();
+      })
+      .catch(error => {
+        console.error("Error!", error.message);
+        document.getElementById("responseMsg").textContent = "❌ Something went wrong.";
+      });
+    });
+  </script>
+
+</body>
+</html>
