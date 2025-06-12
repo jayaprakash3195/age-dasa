@@ -1,131 +1,89 @@
 <!DOCTYPE html>
 <html lang="ta">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JP's Astro Research</title>
+  <meta charset="UTF-8" />
+  <title>நட்சத்திர கணிப்பு</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
+      background-color: yellow;
+      opacity: 0.7;
+      font-family: 'Noto Sans Tamil', Arial, sans-serif;
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f2f2f2;
+      border-radius: 100px;
     }
-
-    header {
-      background-color: #d4f4d2;
-      padding: 20px;
-      text-align: center;
+    label, select, button {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
     }
-
-    header h1 {
-      color: #2d702d;
-      margin: 0;
+    select, button {
+      width: 50%;
+      padding: 1.0rem;
     }
-
-    .container {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-
-    .bio, .link, .form-block {
-      background: #ffffff;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .bio h2, .link h2, .form-block h2 {
-      margin-top: 0;
-      color: #2d702d;
-    }
-
-    input[type="text"], input[type="date"], input[type="time"], textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
+    .result {
+      margin-top: 1.5rem;
+      background: rgb(244, 212, 215);
+      padding: 1rem;
       border-radius: 6px;
-    }
-
-    button {
-      background-color: #2d702d;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #205220;
+      font-size: 1.2rem; 
+      color: #1b5e20;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>JP's Astro Research</h1>
-  </header>
+<h2>நட்சத்திர கணிப்பு</h2>
 
-  <div class="container">
-    <div class="bio">
-      <h2>About JP</h2>
-      <p>I am Jayprakash, passionate about Tamil astrology, KP system, Dasha-Bhukti, and Nakshatra-level analysis. This is a personal research portal to guide based on deep Jyotish knowledge. ❤️</p>
-    </div>
+<label for="nakshatra">உங்கள் நட்சத்திரத்தைத் தேர்ந்தெடுக்கவும்:</label>
+<select id="nakshatra">
+  <option value="">-- தேர்வு செய்யவும் --</option>
+</select>
 
-    <div class="link">
-      <h2>My Links</h2>
-      <p>🔗 <a href="https://jayaprakash3195.github.io/my-website/" target="_blank">Click here to visit dasa based on age </a></p>
-    </div>
+<button onclick="calculate()">கணக்கிடு</button>
 
-    <div class="form-block">
-      <h2>Request Your Horoscope Reading</h2>
-      <form id="astroForm">
-        <label>Date of Birth:</label>
-        <input type="date" name="dob" required>
+<div id="output" class="result" style="display:none;"></div>
 
-        <label>Time of Birth:</label>
-        <input type="time" name="tob" required>
+<script>
+  const nakshatras = [
+    "அசுவினி", "பரணி", "கார்த்திகை", "ரோகிணி", "மிருகசீரிடம்", "திருவாதிரை", "புனர்பூசம்",
+    "பூசம்", "ஆயில்யம்", "மகம்", "பூரம்", "உத்திரம்", "அஸ்தம்", "சித்திரை", "சுவாதி",
+    "விசாகம்", "அனுஷம்", "கேட்டை", "மூலம்", "பூராடம்", "உத்திராடம்", "திருவோணம்",
+    "அவிட்டம்", "சதயம்", "பூரட்டாதி", "உத்திரட்டாதி", "ரேவதி"
+  ];
 
-        <label>Place of Birth:</label>
-        <input type="text" name="pob" placeholder="City, State" required>
+  const select = document.getElementById("nakshatra");
+  nakshatras.forEach((nakshatra, i) => {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = nakshatra;
+    select.appendChild(option);
+  });
 
-        <label>Your Question:</label>
-        <textarea name="question" rows="4" placeholder="Enter your question here..." required></textarea>
+  function calculate() {
+    const selectedIndex = parseInt(select.value);
+    const output = document.getElementById("output");
 
-        <button type="submit">Submit</button>
-      </form>
-      <p id="responseMsg" style="margin-top:15px; color: green;"></p>
-    </div>
-  </div>
+    if (isNaN(selectedIndex)) {
+      output.style.display = "none";
+      alert("தயவுசெய்து ஒரு நட்சத்திரத்தைத் தேர்ந்தெடுக்கவும்.");
+      return;
+    }
 
-  <script>
-    document.getElementById("astroForm").addEventListener("submit", function(event) {
-      event.preventDefault();
+    const vainasikamIndex = (selectedIndex + 21) % 27;  // 22nd
+    const vathaiIndex = (selectedIndex + 6) % 27;       // 7th
+    const yogiIndex = (selectedIndex + 7) % 27;   // 8th
 
-      const form = event.target;
-      const formData = new FormData(form);
-
-      const scriptURL = "https://script.google.com/macros/s/AKfycbzcOnscdiNCiuX-5xInzcCzwEWHiTOqMCrzFRnR7hVIcsUPjY4kMigv1avf_8yYd_uW/exec"; // Replace with your actual Web App URL
-
-      fetch(scriptURL, {
-        method: "POST",
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById("responseMsg").textContent = data;
-        form.reset();
-      })
-      .catch(error => {
-        console.error("Error!", error.message);
-        document.getElementById("responseMsg").textContent = "❌ Something went wrong.";
-      });
-    });
-  </script>
+    output.innerHTML = `
+      <strong>உங்கள் நட்சத்திரம்:</strong> ${nakshatras[selectedIndex]}<br><br>
+      <strong>வைநாசிக நட்சத்திரம்:</strong> ${nakshatras[vainasikamIndex]}<br>
+      <strong>வதை நட்சத்திரம்:</strong> ${nakshatras[vathaiIndex]}<br>
+      <strong>யோகி நட்சத்திரம்:</strong> ${nakshatras[yogiIndex]}
+    `;
+    output.style.display = "block";
+  }
+</script>
 
 </body>
 </html>
