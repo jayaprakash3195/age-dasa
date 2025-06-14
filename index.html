@@ -1,89 +1,211 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>நட்சத்திர கணிப்பு</title>
+  <title>Astrology Dasha with Rasi</title>
   <style>
     body {
-      background-color: yellow;
-      opacity: 0.7;
-      font-family: 'Noto Sans Tamil', Arial, sans-serif;
-      max-width: 500px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: #f2f2f2;
-      border-radius: 100px;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f0f4f8;
     }
-    label, select, button {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
+    h1, h2 {
+      color: #333;
     }
-    select, button {
-      width: 50%;
-      padding: 1.0rem;
+    label, input, select, button {
+      font-size: 1rem;
+      margin-top: 10px;
+      display: block;
     }
-    .result {
-      margin-top: 1.5rem;
-      background: rgb(244, 212, 215);
-      padding: 1rem;
-      border-radius: 6px;
-      font-size: 1.2rem; 
-      color: #1b5e20;
+    input, select {
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 8px 15px;
+      cursor: pointer;
+    }
+    .dasha {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .sub {
+      margin-left: 20px;
+    }
+    .house {
+      margin-left: 40px;
+      color: #555;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-<h2>நட்சத்திர கணிப்பு</h2>
+  <h1>🌟 Astrology Dasha App with Rasi</h1>
 
-<label for="nakshatra">உங்கள் நட்சத்திரத்தைத் தேர்ந்தெடுக்கவும்:</label>
-<select id="nakshatra">
-  <option value="">-- தேர்வு செய்யவும் --</option>
-</select>
+  <label for="dob">Date of Birth:</label>
+  <input type="date" id="dob" />
 
-<button onclick="calculate()">கணக்கிடு</button>
+  <label for="gender">Gender:</label>
+  <select id="gender">
+    <option value="">Select Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select>
 
-<div id="output" class="result" style="display:none;"></div>
+  <button onclick="showDasha()">Show Dasha</button>
 
-<script>
-  const nakshatras = [
-    "அசுவினி", "பரணி", "கார்த்திகை", "ரோகிணி", "மிருகசீரிடம்", "திருவாதிரை", "புனர்பூசம்",
-    "பூசம்", "ஆயில்யம்", "மகம்", "பூரம்", "உத்திரம்", "அஸ்தம்", "சித்திரை", "சுவாதி",
-    "விசாகம்", "அனுஷம்", "கேட்டை", "மூலம்", "பூராடம்", "உத்திராடம்", "திருவோணம்",
-    "அவிட்டம்", "சதயம்", "பூரட்டாதி", "உத்திரட்டாதி", "ரேவதி"
-  ];
+  <div id="result" style="margin-top: 30px;"></div>
 
-  const select = document.getElementById("nakshatra");
-  nakshatras.forEach((nakshatra, i) => {
-    const option = document.createElement("option");
-    option.value = i;
-    option.textContent = nakshatra;
-    select.appendChild(option);
-  });
-
-  function calculate() {
-    const selectedIndex = parseInt(select.value);
-    const output = document.getElementById("output");
-
-    if (isNaN(selectedIndex)) {
-      output.style.display = "none";
-      alert("தயவுசெய்து ஒரு நட்சத்திரத்தைத் தேர்ந்தெடுக்கவும்.");
-      return;
+  <script>
+    function calculateAgeYM(startDate, endDate) {
+      let years = endDate.getFullYear() - startDate.getFullYear();
+      let months = endDate.getMonth() - startDate.getMonth();
+      if (endDate.getDate() < startDate.getDate()) months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      return { years, months };
     }
 
-    const vainasikamIndex = (selectedIndex + 21) % 27;  // 22nd
-    const vathaiIndex = (selectedIndex + 6) % 27;       // 7th
-    const yogiIndex = (selectedIndex + 7) % 27;   // 8th
+    function addYearsFractionToDate(startDate, yearsFraction) {
+      const daysToAdd = Math.round(yearsFraction * 365.25);
+      const resultDate = new Date(startDate.getTime());
+      resultDate.setDate(resultDate.getDate() + daysToAdd);
+      return resultDate;
+    }
 
-    output.innerHTML = `
-      <strong>உங்கள் நட்சத்திரம்:</strong> ${nakshatras[selectedIndex]}<br><br>
-      <strong>வைநாசிக நட்சத்திரம்:</strong> ${nakshatras[vainasikamIndex]}<br>
-      <strong>வதை நட்சத்திரம்:</strong> ${nakshatras[vathaiIndex]}<br>
-      <strong>யோகி நட்சத்திரம்:</strong> ${nakshatras[yogiIndex]}
-    `;
-    output.style.display = "block";
-  }
-</script>
+    function showDasha() {
+      const dobInput = document.getElementById("dob").value;
+      const gender = document.getElementById("gender").value;
+
+      if (!dobInput || !gender) {
+        alert("Please enter DOB and gender.");
+        return;
+      }
+
+      const dob = new Date(dobInput);
+      const now = new Date();
+      const ageNow = calculateAgeYM(dob, now);
+      const totalYears = ageNow.years + ageNow.months / 12;
+
+      const dashasMale = [
+        { name: "Ketu", years: 7 },
+        { name: "Venus", years: 20 },
+        { name: "Sun", years: 6 },
+        { name: "Moon", years: 10 },
+        { name: "Mars", years: 7 },
+        { name: "Rahu", years: 18 },
+        { name: "Jupiter", years: 16 },
+        { name: "Saturn", years: 19 },
+        { name: "Mercury", years: 17 }
+      ];
+
+      // Female dashas split as per request:
+      // Mars starting from part 3 (2 parts), then others full 4 parts each
+      const dashasFemale = [
+        { name: "Mars", years: 7, parts: 2 },    // last 2 parts only (part3 & 4)
+        { name: "Rahu", years: 18, parts: 4 },
+        { name: "Jupiter", years: 16, parts: 4 },
+        { name: "Saturn", years: 19, parts: 4 },
+        { name: "Mercury", years: 17, parts: 4 },
+        { name: "Ketu", years: 7, parts: 4 },
+        { name: "Venus", years: 20, parts: 4 },
+        { name: "Sun", years: 6, parts: 4 },
+        { name: "Moon", years: 10, parts: 4 }
+      ];
+
+      const rasisMale = [
+        "Mesham", "Rishabam", "Mithunam", "Kadagam",
+        "Simmam", "Kanni", "Thulam", "Vrichigam",
+        "Dhanusu", "Magaram", "Kumbam", "Meenam"
+      ];
+
+      const rasisFemale = [
+        "Thulam", "Vrichigam", "Dhanusu", "Magaram",
+        "Kumbam", "Meenam", "Mesham", "Rishabam",
+        "Mithunam", "Kadagam", "Simmam", "Kanni"
+      ];
+
+      let resultHTML = `<h2>Mahadasha with Rasis — Age: ${ageNow.years}y ${ageNow.months}m</h2>`;
+      let elapsedYears = 0;
+      let partIndex = 0;
+
+      if (gender === "male") {
+        for (const dasha of dashasMale) {
+          const isCurrentDasha = totalYears >= elapsedYears && totalYears < elapsedYears + dasha.years;
+          const dashaColor = isCurrentDasha ? 'blue' : 'black';
+
+          resultHTML += `<div class="dasha" style="color: ${dashaColor};">
+            ${dasha.name} Mahadasha: Age ${elapsedYears} – ${elapsedYears + dasha.years} ${isCurrentDasha ? "← Current Mahadasha" : ""}
+          </div>`;
+
+          const quarter = dasha.years / 4;
+
+          for (let i = 0; i < 4; i++) {
+            const partStart = addYearsFractionToDate(dob, elapsedYears + i * quarter);
+            const partEnd = addYearsFractionToDate(dob, elapsedYears + (i + 1) * quarter);
+
+            const startYM = calculateAgeYM(dob, partStart);
+            const endYM = calculateAgeYM(dob, partEnd);
+
+            const isCurrentPart = totalYears >= (elapsedYears + i * quarter) && totalYears < (elapsedYears + (i + 1) * quarter);
+            const partColor = isCurrentPart ? 'blue' : 'gray';
+
+            const rasi = rasisMale[partIndex % rasisMale.length];
+            partIndex++;
+
+            resultHTML += `<div class="sub" style="color: ${partColor};">
+              Age ${startYM.years}y ${startYM.months}m – ${endYM.years}y ${endYM.months}m ${isCurrentPart ? "← Now" : ""}
+            </div>`;
+
+            resultHTML += `<div class="house" style="color: ${partColor};">${rasi}</div>`;
+          }
+
+          elapsedYears += dasha.years;
+        }
+      } else {
+        // Female logic
+        for (const dasha of dashasFemale) {
+          const partsCount = dasha.parts || 4;
+          const partDuration = dasha.years / 4; // each part is quarter of dasha.years
+          const totalDashaDuration = partDuration * partsCount;
+
+          const isCurrentDasha = totalYears >= elapsedYears && totalYears < elapsedYears + totalDashaDuration;
+          const dashaColor = isCurrentDasha ? 'red' : 'black';
+
+          resultHTML += `<div class="dasha" style="color: ${dashaColor};">
+            ${dasha.name} Mahadasha: Age ${elapsedYears} – ${elapsedYears + totalDashaDuration} ${isCurrentDasha ? "← Current Mahadasha" : ""}
+          </div>`;
+
+          for (let i = 0; i < partsCount; i++) {
+            const partStart = addYearsFractionToDate(dob, elapsedYears + i * partDuration);
+            const partEnd = addYearsFractionToDate(dob, elapsedYears + (i + 1) * partDuration);
+
+            const startYM = calculateAgeYM(dob, partStart);
+            const endYM = calculateAgeYM(dob, partEnd);
+
+            const isCurrentPart = totalYears >= (elapsedYears + i * partDuration) && totalYears < (elapsedYears + (i + 1) * partDuration);
+            const partColor = isCurrentPart ? 'red' : 'gray';
+
+            const rasi = rasisFemale[partIndex % rasisFemale.length];
+            partIndex++;
+
+            resultHTML += `<div class="sub" style="color: ${partColor};">
+              Age ${startYM.years}y ${startYM.months}m – ${endYM.years}y ${endYM.months}m ${isCurrentPart ? "← Now" : ""}
+            </div>`;
+
+            resultHTML += `<div class="house" style="color: ${partColor};">${rasi}</div>`;
+          }
+
+          elapsedYears += totalDashaDuration;
+        }
+      }
+
+      document.getElementById("result").innerHTML = resultHTML;
+    }
+  </script>
 
 </body>
 </html>
