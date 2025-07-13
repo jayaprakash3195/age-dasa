@@ -5,57 +5,113 @@
   <title>ஜாதகம் தசா மற்றும் ராசி</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       padding: 30px;
-      background-color: #f0f4f8;
-    }
-    h1, h2 {
+      background: linear-gradient(to right, #f0f8ff, #fbeff5);
       color: #333;
     }
-    label, input, select, button {
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #6a1b9a;
+      margin-bottom: 30px;
+    }
+
+    label {
       font-size: 1rem;
       margin-top: 10px;
-      display: block;
     }
-    input, select {
-      padding: 5px;
-      margin-bottom: 15px;
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
+
     button {
-      padding: 8px 15px;
+      background-color: #8e24aa;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .dasha {
-      margin-top: 20px;
-      font-weight: bold;
+
+    button:hover {
+      background-color: #6a1b9a;
     }
-    .sub {
-      margin-left: 20px;
+
+    .dasha-card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 8px solid #ccc;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
     }
-    .house {
-      margin-left: 40px;
+
+    .dasha-card.active {
+      border-left-color: #2e7d32;
+      background: #e8f5e9;
+    }
+
+    .dasha-title {
       font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #4e148c;
       font-weight: bold;
+    }
+
+    .rasi {
+      font-size: 1.1rem;
+      color: #d81b60;
+      margin-top: 8px;
+    }
+
+    .now-badge {
+      background-color: #2e7d32;
+      color: white;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+
+    .age-range {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    @media (min-width: 768px) {
+      input, select, button {
+        width: 60%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>🌟 ஜாதக தசா மற்றும் ராசி</h1>
+  <h1>🌟 ஜாதகம் தசா மற்றும் ராசி</h1>
 
-  <label for="dob">பிறந்த தேதி:</label>
+  <label for="dob">📅 பிறந்த தேதி:</label>
   <input type="date" id="dob" />
 
-  <label for="gender">Gender:</label>
+  <label for="gender">👤 பாலினம்:</label>
   <select id="gender">
-    <option value="">PLEASE SELECT GENDER</option>
+    <option value="">தேர்ந்தெடுக்கவும்</option>
     <option value="male">ஆண்</option>
     <option value="female">பெண்</option>
   </select>
 
-  <button onclick="showDasha()">SHOW DASA</button>
+  <button onclick="showDasha()">🔮 தசை கணக்கிடு</button>
 
-  <div id="result" style="margin-top: 30px;"></div>
+  <div id="result"></div>
 
   <script>
     function addYearsAndMonths(date, years, months) {
@@ -86,8 +142,11 @@
     function showDasha() {
       const dobInput = document.getElementById("dob").value;
       const gender = document.getElementById("gender").value;
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = '';
+
       if (!dobInput || !gender) {
-        alert("PLEASE SLECT GENDER AND DATE OF BIRTH");
+        alert("தயவுசெய்து பிறந்த தேதி மற்றும் பாலினத்தை தேர்வு செய்யவும்.");
         return;
       }
 
@@ -114,7 +173,6 @@
         "தனுசு", "மகரம்", "கும்பம்", "மீனம்"
       ];
 
-      // Step 1: Generate 36 parts
       let allParts = [];
       for (const dasha of dashas) {
         for (let i = 0; i < 4; i++) {
@@ -122,7 +180,6 @@
         }
       }
 
-      // Female logic: Start from செவ்வாய் 3rd part to 2nd part
       if (gender === 'female') {
         const startIndex = allParts.findIndex(p => p.dasha === "செவ்வாய்" && p.part === 3);
         const rotated = allParts.slice(startIndex).concat(allParts.slice(0, startIndex));
@@ -134,36 +191,36 @@
         allParts = filtered;
       }
 
-      const rasiStartIndex = gender === "female" ? 6 : 0; // துலாம் or மேஷம்
-      let resultHTML = `<h2>தசா & ராசி — வயது: ${age.years} வருடம் ${age.months} மாதம்</h2>`;
+      const rasiStartIndex = gender === "female" ? 6 : 0;
       let elapsedYears = 0;
+
+      const header = `<h2>🔎 தசா & ராசி — வயது: ${age.years} வருடம் ${age.months} மாதம்</h2>`;
+      resultDiv.innerHTML += header;
 
       for (let i = 0; i < allParts.length; i++) {
         const part = allParts[i];
         const partStart = addYearsFractionToDateAccurate(dob, elapsedYears);
         const partEnd = addYearsFractionToDateAccurate(dob, elapsedYears + part.years);
-        const partAgeInYears = elapsedYears;
-        const partColor = (totalYears >= partAgeInYears && totalYears < partAgeInYears + part.years)
-          ? "green" : "gray";
         const rasi = rasis[(rasiStartIndex + i) % 12];
 
         const ageStart = calculateAgeYM(dob, partStart);
         const ageEnd = calculateAgeYM(dob, partEnd);
 
-        resultHTML += `<div class="dasha" style="color: ${partColor};">
-          ${part.dasha} தசை பகுதி ${part.part}:
-          வயது ${ageStart.years}வ ${ageStart.months}ம – ${ageEnd.years}வ ${ageEnd.months}ம
-          ${partColor === "green" ? " ← இப்போது" : ""}
-        </div>`;
+        const isActive = totalYears >= elapsedYears && totalYears < elapsedYears + part.years;
+        const cardClass = isActive ? "dasha-card active" : "dasha-card";
 
-        resultHTML += `<div class="house" style="color: ${partColor}; font-size:1.4rem;">
-          ⭐ ${rasi}
-        </div>`;
+        resultDiv.innerHTML += `
+          <div class="${cardClass}">
+            <div class="dasha-title">${part.dasha} தசை — பகுதி ${part.part}
+              ${isActive ? '<span class="now-badge">தற்போது</span>' : ''}
+            </div>
+            <div class="age-range">📆 வயது: ${ageStart.years}வ ${ageStart.months}ம – ${ageEnd.years}வ ${ageEnd.months}ம</div>
+            <div class="rasi">🌟 ராசி: ${rasi}</div>
+          </div>
+        `;
 
         elapsedYears += part.years;
       }
-
-      document.getElementById("result").innerHTML = resultHTML;
     }
   </script>
 
